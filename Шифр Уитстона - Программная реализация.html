@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Шифр Уитстона - Программная реализация</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="favicon.png" rel="icon" type="image/png" />
+  </head>
+
+  <body>
+    <style>
+      input[type="button"]{
+        background-color: peru;
+        padding: 10px 30px;
+        color: #FFFFFF;
+        font-size: 17px;
+        font-weight: 700;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        border-radius: 15px;
+        transition: .2s linear;
+      }
+      input[type="button"]:hover{
+        background-color: orange;
+      }
+      body{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      * {
+        font-family: 'Monsterat', sans-serif;
+        font-size: 16px;
+      }
+      
+    </style>
+
+    <script>
+      function shifr(b) {
+        var p = " ",
+          t = document.getElementById("txt").value.replace(/\r/g, "").replace(/\n/g, p).replace(/\s{2,}/g, p).replace(/ё/gi, "е").replace(/й/gi, "и"); //замена абзацов, двойных пробелов, ё, й и т.д.
+        if (t.replace(/[а-я\.\,\: ]/gi, "").length) { //проверка на недопустимые символы
+          alert("В тексте имеются недопустимые символы");
+          return; 
+        }
+        t = t.toUpperCase(); //перевод в апперкейс
+        if (t.length % 2) t += p; //если длина входных данных - нечётная => добавить пробел
+        var Q = function (x) {
+            var y = ".,:";
+            return x < 32
+              ? x == 9
+                ? " "
+                : String.fromCharCode(x * 1 + 1040)
+              : y.charAt(x - 32);
+          },
+          R = function (x) {
+            var z = x.slice(0),
+              y = [];
+            while (z.length)
+              y[y.length] = z.splice(Math.random() * z.length, 1);
+            return y;
+          };
+        for (var N = [], j = 0; j < 35; N[j] = j, j++);
+        for (var F = R(N), S = R(N), j = 0; j < 35; F[j] = Q(F[j]), S[j] = Q(S[j]), j++);
+        var o = document.getElementById("key").rows[0].cells;
+        o[1].innerHTML = "&nbsp;";
+        for (var j = (r = 0); j < 35; j += 5, ++r)
+          for (var k = 0; k < 5; k++)
+            (o[0].firstChild.rows[r].cells[k].innerHTML = F[j + k]),
+              (o[2].firstChild.rows[r].cells[k].innerHTML = S[j + k]);
+        (F = F.join("")), (S = S.join(""));
+        var Z = function (x) {
+          var y = Math.floor(x / 5);
+          return [y, x - y * 5];
+        };
+        for (var W = [], h = t.length, j = 0; j < h; j += 2) {
+          var e = Z(F.indexOf(t.charAt(j))).concat(
+            Z(S.indexOf(t.charAt(j + 1)))
+          );
+          (W[j] = S.charAt(e[0] * 5 + e[3])),
+            (W[j + 1] = F.charAt(e[2] * 5 + e[1]));
+        }
+        (document.getElementById("cod").value = W.join("")) //вывод данных
+      }
+
+    </script> 
+      <pre style="font-size: 12px; color: #000000;">
+Введите исходный текст, СОДЕРЖАЩИЙ:
+русские буквы в любом регистре, точки, запятые, двоеточия, пробелы, табуляцию и переводы строк.
+            
+Перед шифрованием в исходном тексте АВТОМАТИЧЕСКИ:
+- все переводы строк будут преобразованы в пробелы,
+- все двойные пробельные символы будут преобразованы в одинарные,
+- все буквы будут переведены в верхний регистр,
+- все буквы ё и Ё будут заменены на Е, а буквы й и Й на И,
+- при нечетном количестве символов в конец текста будет добавлен пробел.</pre>
+
+      <input type="text" id="txt" style="width: 600px;" placeholder="Введите входящие данные">
+    <input type="button" value="Вперёд!" onclick="shifr(this)" style="margin: 20px auto;"/>
+    <table id="key" cellspacing="0" cellpadding="0" style="width: 600px; background-color: #efefef"></table>
+    <script>
+      (function () {
+        var o = document.getElementById("key"),
+          ro = o.insertRow(-1),
+          T = function (x) {
+            var t = document.createElement("table");
+            (t.cellPadding = t.cellSpacing = 0),
+              (t.border = 1),
+              (t.borderColor = "#eee"),
+              (t.style.borderCollapse = "collapse");
+            for (var r = 0; r < 7; r++)
+              for (var rx = t.insertRow(-1), c = 0; c < 5; c++)
+                (cx = rx.insertCell(-1)),
+                  (cx.style.textAlign = "center"),
+                  (cx.style.padding = "2px 16px"),
+                  (cx.innerHTML = "&nbsp;");
+            x.appendChild(t);
+          };
+        for (var j = 0, co; j < 3; j++)
+          (co = ro.insertCell(-1)), (co.style.width = "200px"), (co.style.textAlign = "center");
+        o.rows[0].cells[1].innerHTML = "Здесь будут кодовые таблицы Уотстона";
+        T(o.rows[0].cells[0]);
+        T(o.rows[0].cells[2]);
+      })();
+    </script>
+    <p>
+      <textarea id="cod" style="width: 600px; height: 200px" placeholder="Здесь будет шифр" readonly></textarea>
+    </p>
+  </body>
+</html>
